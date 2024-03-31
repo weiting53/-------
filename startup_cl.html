@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>珍珠奶茶帝國_毛利率計算機</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 50px auto;
+            max-width: 600px;
+            padding: 20px;
+            border: 2px solid white;
+            border-radius: 10px;
+        }
+        input[type="number"] {
+            width: 100px;
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+
+//椲庭的珍珠奶茶帝國專案
+</head>
+<body>
+    <div class="container">
+        <h2>珍珠奶茶帝國參數計算機</h2>
+        <div>
+            <label for="webTraffic">網路流量 (人次/週): </label>
+            <input type="number" id="webTraffic" min="0">
+        </div>
+        <div>
+            <label for="conversionRate">流量轉換率 (%): </label>
+            <input type="number" id="conversionRate" min="0" max="100" value="10">
+        </div>
+        <div>
+            <label for="location">店面位置基礎數值: </label>
+            <select id="location" onchange="updateBaseValue()">
+                <option value="gold">金</option>
+                <option value="silver">銀</option>
+                <option value="copper">銅</option>
+                <option value="iron">鐵</option>
+            </select>
+            <input type="number" id="baseValue" readonly>
+        </div>
+        <div>
+            <label for="repurchaseRate">回購率參數 (%): </label>
+            <input type="number" id="repurchaseRate" min="0" max="100" value="100">
+        </div>
+        <div>
+            <label for="bonusCups">獎勵杯數: </label>
+            <input type="number" id="bonusCups" min="0" value="0">
+        </div>
+        <div>
+            <label for="punishCups">懲罰杯數: </label>
+            <input type="number" id="punishCups" min="0" value="0">
+        </div>
+        <div>
+            <label for="rent">店租 (NTD): </label>
+            <input type="number" id="rent" min="0">
+        </div>
+        <div>
+            <label for="utilities">水電費 (NTD): </label>
+            <input type="number" id="utilities" value="2000" readonly>
+        </div>
+        <div>
+            <label for="transportation">交通費用 (NTD): </label>
+            <input type="number" id="transportation" min="0" value="300">
+        </div>
+        <hr>
+        <div>
+            <label for="unitPrice">飲料單價 (NTD): </label>
+            <input type="number" id="unitPrice" min="0">
+        </div>
+        <button onclick="calculateResults('low')">淡季</button>
+        <button onclick="calculateResults('high')">旺季</button>
+        <div id="result"></div>
+        <div id="indicators"></div>
+    </div>
+    <script>
+        function updateBaseValue() {
+            const location = document.getElementById('location').value;
+            let baseValue = 0;
+            switch(location) {
+                case 'gold':
+                    baseValue = 150;
+                    break;
+                case 'silver':
+                    baseValue = 120;
+                    break;
+                case 'copper':
+                    baseValue = 90;
+                    break;
+                case 'iron':
+                    baseValue = 50;
+                    break;
+                default:
+                    baseValue = 0;
+            }
+            document.getElementById('baseValue').value = baseValue;
+        }
+
+        function getRandomUtilitiesIndex() {
+            return Math.random() * (1.4 - 0.9) + 0.9;
+        }
+
+        function getRandomRawMaterialsIndex() {
+            return Math.random() * (1.4 - 0.9) + 0.9;
+        }
+
+        function calculateResults(season) {
+            let seasonality;
+            if (season === 'low') {
+                seasonality = Math.floor(Math.random() * (100 - 60 + 1)) + 60; //淡季參數是60-100
+            } else if (season === 'high') {
+                seasonality = Math.floor(Math.random() * (150 - 100 + 1)) + 100; //旺季參數是100-150
+            }
+
+            const webTraffic = parseFloat(document.getElementById('webTraffic').value) || 0;
+            const conversionRate = parseFloat(document.getElementById('conversionRate').value) || 0;
+            const baseValue = parseFloat(document.getElementById('baseValue').value) || 0;
+            const repurchaseRate = parseFloat(document.getElementById('repurchaseRate').value) || 0;
+            const bonusCups = parseFloat(document.getElementById('bonusCups').value) || 0;
+            const punishCups = parseFloat(document.getElementById('punishCups').value) || 0;
+            const unitPrice = parseFloat(document.getElementById('unitPrice').value) || 0;
+            const rent = parseFloat(document.getElementById('rent').value) || 0;
+            const utilities = parseFloat(document.getElementById('utilities').value) || 0;
+            const transportation = parseFloat(document.getElementById('transportation').value) || 0;
+
+            // 檢查輸入值是否有效
+            if (isNaN(webTraffic) || isNaN(conversionRate) || isNaN(baseValue) || isNaN(repurchaseRate) || isNaN(unitPrice) || isNaN(rent) || isNaN(utilities) || isNaN(transportation)) {
+                document.getElementById('result').innerHTML = '請輸入有效的數值';
+                document.getElementById('indicators').innerHTML = '';
+                return;
+            }
+
+            const rawMaterialsIndex = getRandomRawMaterialsIndex();
+            const utilities_adjusted = utilities * getRandomUtilitiesIndex();
+
+            // 計算一周賣出杯數
+            const cupsSold = Math.round((webTraffic * conversionRate / 100) + bonusCups + (baseValue * (seasonality / 100) * repurchaseRate / 100 * 7)- punishCups);
+            const revenue = cupsSold * unitPrice;
+            const rawMaterials = cupsSold * unitPrice * 0.3 * rawMaterialsIndex; //飲料原料
+            const expenses = rent + utilities_adjusted + rawMaterials + transportation;
+            const profit = revenue - expenses;
+            const grossMarginRate = (profit / revenue) * 100;
+
+            document.getElementById('result').innerHTML = `
+                預估一週賣出杯數: ${cupsSold} 杯<br>
+                預估一週收入: ${revenue.toFixed(2)} NTD<br>
+                預估一週支出: ${expenses.toFixed(2)} NTD<br>
+                預估一週毛利: ${profit.toFixed(2)} NTD<br>
+                預估一週毛利率: ${grossMarginRate.toFixed(2)}%<br>
+                <br>
+                飲料原料費用: ${rawMaterials.toFixed(2)} NTD<br>
+                水電調整後費用: ${utilities_adjusted.toFixed(2)} NTD<br>
+            `;
+
+            document.getElementById('indicators').innerHTML = `
+                淡旺季參數: ${seasonality}%<br>
+                水電浮動指數: ${getRandomUtilitiesIndex().toFixed(2)}<br>
+                原物料浮動指數: ${rawMaterialsIndex.toFixed(2)}
+            `;
+        }
+    </script>
+</body>
+</html>
