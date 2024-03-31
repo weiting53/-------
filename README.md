@@ -11,5 +11,10 @@
 [遊戲大綱規劃心智圖](https://miro.com/app/board/uXjVNrH6m48=/?share_link_id=789491853875)
 
 ## 遊戲參數設計
-可以參考以下計算機參數中使用了一些隨機性，目的是為了讓遊戲更能模擬現實中的各種浮動。
-[遊戲參數設計](https://weiting53.github.io/My-Bubble-tea-Empire/startup_cl.html)
+### 參數的設計原則
+* 可玩性(遊戲當中的對錯相應的賞罰是否能影響玩家)
+* 合理性(一般情況下毛利率符合餐飲業的標準-通常為30%)
+* 與現實的契合(物價及店租參考台北)
+
+可以參考以下計算機參數中使用了一些隨機性，目的是為了讓遊戲更能模擬現實中的各種浮動。[遊戲參數設計計算機](https://weiting53.github.io/My-Bubble-tea-Empire/startup_cl.html)
+
